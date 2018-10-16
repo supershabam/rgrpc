@@ -20,8 +20,15 @@ type Listener struct {
 	m      sync.Mutex
 }
 
+func NewListener(dialer func(context.Context) (net.Conn, error)) (*Listener, error) {
+	return &Listener{
+		dialer: dialer,
+	}, nil
+}
+
 // Accept waits for and returns the next connection to the listener.
 func (l *Listener) Accept() (net.Conn, error) {
+	l.init()
 	c, active := <-l.connch
 	if !active {
 		return nil, l.wait()
@@ -32,6 +39,7 @@ func (l *Listener) Accept() (net.Conn, error) {
 // Close closes the listener.
 // Any blocked Accept operations will be unblocked and return errors.
 func (l *Listener) Close() error {
+	l.init()
 	l.cancel()
 	for c := range l.connch {
 		c.Close()
