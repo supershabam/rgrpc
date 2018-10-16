@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package hello;
+
+service Hello {
+    rpc Greet(Person) returns (Greeting) {}
+}
+
+message Person {
+  string name = 1;
+}
+
+message Greeting {
+  string phase = 1;
+}
