@@ -1,7 +1,7 @@
 # rgrpc
 
-rgrpc (remote gRPC) allows a remote behind-the-firewall device to provice a
-gRPC server for exposing functionality back to a dialable gRPC client.
+rgrpc (remote gRPC) is a library to trick gRPC into allowing a remote 
+behind-the-firewall device to provide a gRPC server back to a dialable gRPC client.
 
 This is achieved by flipping the roles of server and client.
 With rgrpc, the server initiates the network connection to the "client."
