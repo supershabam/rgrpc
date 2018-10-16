@@ -34,10 +34,27 @@ func run(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	cc, err := grpc.DialContext(ctx, "", grpc.WithDialer(d.Dial), grpc.WithInsecure())
-	if err != nil {
-		return err
+	// treat this like a listener.Accept loop
+	for {
+		cc, err := grpc.DialContext(ctx, "",
+			grpc.WithDialer(d.Dial),
+			// MUST instruct grpc to allow insecure. The underlaying
+			// connection may be secure, but grpc won't know that.
+			grpc.WithInsecure(),
+			// MUST instruct grpc to block before returning
+			// a client connection or else this for loop will
+			// become an infinite for loop of compute resource
+			// theft.
+			grpc.WithBlock(),
+		)
+		if err != nil {
+			return err
+		}
+		go handle(ctx, cc)
 	}
+}
+
+func handle(ctx context.Context, cc *grpc.ClientConn) error {
 	defer cc.Close()
 	client := hello.NewHelloClient(cc)
 	resp, err := client.Greet(ctx, &hello.Person{
