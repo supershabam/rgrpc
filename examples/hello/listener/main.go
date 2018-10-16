@@ -13,6 +13,9 @@ import (
 
 const addr = "localhost:9001"
 
+// the listener handles multiple inbound tcp connections and turns them
+// into grpc client connections upon which it can then call the client
+// methods.
 func main() {
 	err := run(context.Background())
 	if err != nil {

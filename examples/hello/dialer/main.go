@@ -15,6 +15,8 @@ import (
 
 const target = "localhost:9001"
 
+// the dialer acts like a gprc server but is actually initiating network
+// connectivity to the listener.
 func main() {
 	err := run(context.Background())
 	if err != nil {
@@ -74,6 +76,7 @@ func dialer() func(ctx context.Context) (net.Conn, error) {
 			conn = c
 			return nil
 		}
+		// TODO backoff.Retry immediately executes op even if the backoff says to delay
 		err := backoff.RetryNotify(
 			op,
 			backoff.WithContext(&noResetBackOff{b}, ctx),
